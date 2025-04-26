@@ -76,8 +76,11 @@
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2">Role IDs (comma separated)</label>
                         <textarea id="roles" class="w-full p-2 border border-gray-300 rounded-md"
-                            placeholder="1092027172195152033, 987654321012345678" rows="2" required></textarea>
+                            placeholder="1092027172195152033, 987654321012345678" rows="2"></textarea>
                         <p class="text-sm text-gray-500 mt-1">Enter Discord role IDs separated by commas - Your Admin role will always be added by default</p>
+                        <p class="text-xs text-gray-500 mt-1">
+                            Don't know how to get Role ID? Go to <a href="https://discordhelp.net/role-id" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">discordhelp.net/role-id</a>
+                        </p>
                     </div>
                     <h3 class="text-xl font-bold mb-2 text-gray-800">Fields</h3>
                     <div id="fieldsContainer">
@@ -151,6 +154,20 @@
             </div>
         </div>
     </div>
+    <div id="exportModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg p-6 w-96 max-w-full">
+            <h3 class="text-xl font-bold mb-4">Export Configuration</h3>
+            <p class="mb-4 text-gray-700">
+                Your configuration has been exported to <code class="text-sm font-mono">ticket_config.json</code>.
+                To import this into your Discord server, use the <code class="text-sm font-mono">/ticket_import</code> command and upload the file.
+            </p>
+            <div class="mt-4 flex justify-end">
+                <button id="closeExportModal" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
     <script>
         // Common emojis for Discord ticket types
         const commonEmojis = [
@@ -189,6 +206,10 @@
         const confirmAction = document.getElementById('confirmAction');
         const cancelAction = document.getElementById('cancelAction');
         const clearAllBtn = document.getElementById('clearAllBtn');
+        const exportModal = document.getElementById('exportModal');
+        const closeExportModal = document.getElementById('closeExportModal');
+        const rolesInput = document.getElementById('roles');
+
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
@@ -210,6 +231,7 @@
             exportBtn.addEventListener('click', handleExport);
             cancelAction.addEventListener('click', () => confirmModal.classList.add('hidden'));
             clearAllBtn.addEventListener('click', () => showConfirm('Are you sure you want to clear all ticket types?', clearAllTicketTypes));
+            closeExportModal.addEventListener('click', () => exportModal.classList.add('hidden'));
 
             // Initialize with one field
             addField();
@@ -312,7 +334,7 @@
             styleSelect.addEventListener('change', () => {
                 if (styleSelect.value === 'select') {
                     optionsContainer.classList.remove('hidden');
-                    maxlengthContainer.classList.add('hidden');
+                     maxlengthContainer.classList.add('hidden');
                 } else if (styleSelect.value === 'text') {
                     optionsContainer.classList.add('hidden');
                     maxlengthContainer.classList.remove('hidden');
@@ -416,7 +438,7 @@
                 type_id: editingIndex >= 0 ? ticketTypes[editingIndex].type_id : generateId('ticket-'),
                 name,
                 emoji,
-                roles, // Store roles as strings
+                roles: roles,
                 prefix,
                 fields
             };
@@ -486,7 +508,7 @@
                             <h3 class="text-xl font-bold">${ticket.emoji} ${ticket.name}</h3>
                             <p class="text-gray-600">ID: ${ticket.type_id}</p>
                             <p class="text-gray-600">Prefix: ${ticket.prefix}</p>
-                            <p class="text-gray-600">Roles: ${ticket.roles.join(', ')}</p>
+                            <p class="text-gray-600">Roles: ${ticket.roles.length > 0 ? ticket.roles.join(', ') : 'No roles'}</p>
                         </div>
                         <div class="flex space-x-2">
                             <button class="edit-btn text-blue-600 hover:text-blue-800" data-index="${index}">
@@ -686,6 +708,9 @@
             document.body.appendChild(downloadAnchorNode);
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
+
+            // Show the export modal
+            exportModal.classList.remove('hidden');
         }
 
         // Import configuration
