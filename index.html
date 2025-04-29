@@ -396,9 +396,9 @@
             const rolesInput = document.getElementById('roles').value.trim();
 
             // Parse roles, ensuring they are strings
-            const roles = rolesInput.split(',')
-                .map(role => role.trim())
-                .filter(role => role); // Keep them as strings
+            const roles = rolesInput
+                ? rolesInput.split(',').map(role => role.trim()).filter(role => role)
+                : [];
 
             // Get fields
             const fields = Array.from(fieldsContainer.children).map(field => {
