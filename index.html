@@ -725,7 +725,18 @@
             reader.onload = (e) => {
                 try {
                     const config = JSON.parse(e.target.result);
-
+                    
+                    // Fix roles early
+                    config.ticket_types.forEach(ticket => {
+                        if (!Array.isArray(ticket.roles)) {
+                            if (typeof ticket.roles === 'string' && ticket.roles.trim() === '') {
+                                ticket.roles = [];
+                            } else {
+                                ticket.roles = [];
+                            }
+                        }
+                    });
+                                       
                     // Validate the structure
                     if (!config.ticket_types || !Array.isArray(config.ticket_types)) {
                         throw new Error('Invalid configuration: missing ticket_types array');
