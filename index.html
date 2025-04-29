@@ -246,63 +246,25 @@
         }
 
         // Function to set up emoji picker
-        async function setupEmojiPicker() {
-        const emojiTabs = document.getElementById('emojiTabs');
-        const emojiGrid = document.getElementById('emojiGrid');
-        emojiTabs.innerHTML = '';
-        emojiGrid.innerHTML = '';
-    
-        const response = await fetch('https://unpkg.com/emoji.json@13.1.0/emoji.json');
-        const emojis = await response.json();
-    
-        // Group emojis by category
-        const categories = {};
-        emojis.forEach(emoji => {
-            if (!categories[emoji.category]) {
-                categories[emoji.category] = [];
-            }
-            categories[emoji.category].push(emoji);
-        });
-    
-        // Create tabs
-        Object.keys(categories).forEach(category => {
-            const tabBtn = document.createElement('button');
-            tabBtn.className = 'bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded-md text-sm';
-            tabBtn.textContent = category.split('&')[0].trim(); // Shorten names if needed
-            tabBtn.onclick = () => {
-                renderEmojiGrid(categories[category]);
-                // Highlight active tab
-                Array.from(emojiTabs.children).forEach(btn => btn.classList.remove('bg-indigo-400', 'text-white'));
-                tabBtn.classList.add('bg-indigo-400', 'text-white');
-            };
-            emojiTabs.appendChild(tabBtn);
-        });
-    
-        // Load first category by default
-        if (Object.keys(categories).length > 0) {
-            const firstCategory = Object.keys(categories)[0];
-            renderEmojiGrid(categories[firstCategory]);
-            emojiTabs.children[0].classList.add('bg-indigo-400', 'text-white');
+        function setupEmojiPicker() {
+          emojiGrid.innerHTML = '';
+          fetch('https://cdn.jsdelivr.net/gh/github/gemoji/db/emoji.json')
+            .then(response => response.json())
+            .then(emojis => {
+              emojis.forEach(emoji => {
+                if (emoji.emoji) { // Some entries have no emoji
+                  const emojiBtn = document.createElement('button');
+                  emojiBtn.className = 'p-2 text-xl hover:bg-gray-100 rounded';
+                  emojiBtn.textContent = emoji.emoji;
+                  emojiBtn.onclick = () => {
+                    document.getElementById('emoji').value = emoji.emoji;
+                    emojiModal.classList.add('hidden');
+                  };
+                  emojiGrid.appendChild(emojiBtn);
+                }
+              });
+            });
         }
-    }
-    
-    function renderEmojiGrid(emojis) {
-        const emojiGrid = document.getElementById('emojiGrid');
-        emojiGrid.innerHTML = '';
-        emojis.forEach(emoji => {
-            if (emoji.char) {
-                const emojiBtn = document.createElement('button');
-                emojiBtn.className = 'p-2 text-xl hover:bg-gray-100 rounded';
-                emojiBtn.textContent = emoji.char;
-                emojiBtn.onclick = () => {
-                    document.getElementById('emoji').value = emoji.char;
-                    document.getElementById('emojiModal').classList.add('hidden');
-                };
-                emojiGrid.appendChild(emojiBtn);
-            }
-        });
-    }
-
 
         // Toggle emoji picker visibility
         function toggleEmojiPicker() {
