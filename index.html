@@ -752,9 +752,17 @@
                                  throw new Error(`Invalid field label length:  Label must be 80 characters or less.`);
                              }
                         });
-                         // Validate roles are strings
-                        if (!Array.isArray(ticket.roles) || !ticket.roles.every(role => typeof role === 'string')) {
-                            throw new Error(`Invalid roles format in ticket type ${ticket.type_id}. Roles must be an array of strings.`);
+                         // Validate roles field
+                        if (!Array.isArray(ticket.roles)) {
+                            if (typeof ticket.roles === 'string' && ticket.roles.trim() === '') {
+                                ticket.roles = [];
+                            } else {
+                                throw new Error(`Invalid roles format in ticket type ${ticket.type_id}. Roles must be an array of strings.`);
+                            }
+                        } else {
+                            if (!ticket.roles.every(role => typeof role === 'string')) {
+                                throw new Error(`Invalid roles format in ticket type ${ticket.type_id}. Roles must be an array of strings.`);
+                            }
                         }
                     });
 
