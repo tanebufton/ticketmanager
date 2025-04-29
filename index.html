@@ -247,17 +247,22 @@
 
         // Function to set up emoji picker
         function setupEmojiPicker() {
-            // Populate emoji grid
-            emojiGrid.innerHTML = '';
-            commonEmojis.forEach(emoji => {
-                const emojiBtn = document.createElement('button');
-                emojiBtn.className = 'p-2 text-xl hover:bg-gray-100 rounded';
-                emojiBtn.textContent = emoji;
-                emojiBtn.onclick = () => {
-                    document.getElementById('emoji').value = emoji;
+          emojiGrid.innerHTML = '';
+          fetch('https://cdn.jsdelivr.net/gh/github/gemoji/db/emoji.json')
+            .then(response => response.json())
+            .then(emojis => {
+              emojis.forEach(emoji => {
+                if (emoji.emoji) { // Some entries have no emoji
+                  const emojiBtn = document.createElement('button');
+                  emojiBtn.className = 'p-2 text-xl hover:bg-gray-100 rounded';
+                  emojiBtn.textContent = emoji.emoji;
+                  emojiBtn.onclick = () => {
+                    document.getElementById('emoji').value = emoji.emoji;
                     emojiModal.classList.add('hidden');
-                };
-                emojiGrid.appendChild(emojiBtn);
+                  };
+                  emojiGrid.appendChild(emojiBtn);
+                }
+              });
             });
         }
 
